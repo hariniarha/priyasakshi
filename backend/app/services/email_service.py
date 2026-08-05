@@ -134,5 +134,21 @@ class EmailService:
             html,
         )
 
+    async def send_order_status_update(self, order: dict) -> None:
+        from .templates import order_status_update_html
+
+        html = order_status_update_html(settings.brand_name, order, settings.frontend_url)
+        status = order.get("status", "updated")
+        subject_map = {
+            "confirmed": f"Your order is confirmed — {settings.brand_name}",
+            "packed": f"Your order is packed — {settings.brand_name}",
+            "shipped": f"Your order has shipped — {settings.brand_name}",
+            "out_for_delivery": f"Your order is out for delivery — {settings.brand_name}",
+            "delivered": f"Your order has been delivered — {settings.brand_name}",
+            "cancelled": f"Your order has been cancelled — {settings.brand_name}",
+        }
+        subject = subject_map.get(status, f"Order update — {settings.brand_name}")
+        await self._send(order.get("customer_email", ""), subject, html)
+
 
 email_service = EmailService()

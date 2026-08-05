@@ -117,3 +117,59 @@ def password_reset_html(brand: str, reset_url: str) -> str:
         f"<p style='font-size:13px;color:#2E2825'>If you didn't request this, you can safely ignore this email. Link: {reset_url}</p>"
     )
     return _shell(brand, content)
+
+
+def order_status_update_html(brand: str, order: dict, frontend_url: str) -> str:
+    status = order.get("status", "updated")
+    status_labels = {
+        "confirmed": "Confirmed",
+        "processing": "Processing",
+        "packed": "Packed",
+        "shipped": "Shipped",
+        "out_for_delivery": "Out for Delivery",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled",
+    }
+    label = status_labels.get(status, status)
+
+    tracking_block = ""
+    if order.get("tracking_number"):
+        courier = order.get("courier") or "our courier"
+        tracking_block = (
+            f"<p style='background:#F3EBDC;padding:14px 16px;border-radius:12px;margin:16px 0'>"
+            f"<strong>Courier:</strong> {courier}<br>"
+            f"<strong>Tracking Number:</strong> {order['tracking_number']}"
+        )
+        if order.get("estimated_delivery"):
+            try:
+                ed = order["estimated_delivery"][:10]
+            except Exception:
+                ed = order["estimated_delivery"]
+            tracking_block += f"<br><strong>Estimated Delivery:</strong> {ed}"
+        tracking_block += "</p>"
+
+    timeline = order.get("timeline", [])
+    timeline_html = ""
+    if timeline:
+        rows = "".join(
+            f"<li style='margin-bottom:10px'><strong>{t.get('label', t.get('status', ''))}</strong>"
+            f"<br><span style='font-size:13px;color:#2E2825'>{t.get('note', '')}</span>"
+            f"<br><span style='font-size:11px;color:#2E2825'>{t.get('at', '')[:16]}</span></li>"
+            for t in timeline[-6:]
+        )
+        timeline_html = (
+            f"<h3 style='color:#8B2956;margin-top:24px'>Order Timeline</h3>"
+            f"<ul style='padding-left:18px'>{rows}</ul>"
+        )
+
+    orders_link = f"{frontend_url}/account/orders"
+    content = (
+        f"<h2 style='color:#8B2956;margin-top:0'>Hi {order.get('customer_name','there')},</h2>"
+        f"<p>Your order <strong>#{str(order.get('id',''))[:8]}</strong> has been updated to "
+        f"<strong>{label}</strong>.</p>"
+        f"{tracking_block}"
+        f"{timeline_html}"
+        f"<p style='margin-top:24px;font-size:13px;color:#2E2825'>"
+        f"Track your order anytime: <a href='{orders_link}'>{orders_link}</a></p>"
+    )
+    return _shell(brand, content)

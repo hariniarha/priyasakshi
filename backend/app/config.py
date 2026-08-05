@@ -69,6 +69,13 @@ class Settings(BaseSettings):
         1, alias="PASSWORD_RESET_TOKEN_EXPIRE_HOURS"
     )
 
+    # ---- Admin ----
+    # Comma-separated allowlist of admin email addresses (lower-cased).
+    admin_emails: str = Field(
+        "arunbabuceg@gmail.com,admin@priyasakshi.com",
+        alias="ADMIN_EMAILS",
+    )
+
     @property
     def cors_origins_list(self) -> List[str]:
         raw = (self.cors_origins or "").strip()
@@ -79,6 +86,14 @@ class Settings(BaseSettings):
     @property
     def allow_credentials(self) -> bool:
         return self.cors_origins_list != ["*"]
+
+    @property
+    def admin_emails_set(self) -> set[str]:
+        return {
+            e.strip().lower()
+            for e in (self.admin_emails or "").split(",")
+            if e.strip()
+        }
 
 
 @lru_cache

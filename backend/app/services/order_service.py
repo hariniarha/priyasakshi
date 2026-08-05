@@ -118,7 +118,7 @@ class OrderService:
     ) -> dict | None:
         """Called once the Razorpay signature has been verified."""
         now = _now()
-        return await get_db().orders.find_one_and_update(
+        updated = await get_db().orders.find_one_and_update(
             {"id": order_id},
             {
                 "$set": {

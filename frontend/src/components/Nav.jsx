@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShoppingBag, Menu, X, User, LogOut, LayoutDashboard, MailCheck, Loader as Loader2 } from 'lucide-react';
+import { ShoppingBag, Menu, X, User, LogOut, LayoutDashboard, MailCheck, Loader as Loader2, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { useCart } from '@/context/CartContext';
@@ -18,7 +18,7 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const { count, setIsOpen, bounce } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -154,6 +154,15 @@ export default function Nav() {
                       >
                         <LayoutDashboard className="w-4 h-4" /> My Account
                       </button>
+                      {isAdmin && (
+                        <button
+                          onClick={() => { setMenuOpen(false); navigate('/admin'); }}
+                          className="w-full text-left px-3 py-2 rounded-2xl text-sm text-[#8B2956] hover:bg-[#F5EBF0] flex items-center gap-2"
+                          data-testid="nav-admin-btn"
+                        >
+                          <Shield className="w-4 h-4" /> Admin Dashboard
+                        </button>
+                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-3 py-2 rounded-2xl text-sm text-[#2E2825] hover:bg-[#F5EBF0] flex items-center gap-2"
@@ -239,6 +248,15 @@ export default function Nav() {
                     >
                       <LayoutDashboard className="w-4 h-4" /> My Account
                     </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => { setMobileOpen(false); navigate('/admin'); }}
+                        className="w-full text-left px-4 py-3 rounded-2xl text-[#8B2956] font-medium hover:bg-[#F5EBF0] flex items-center gap-2"
+                        data-testid="mobile-admin-btn"
+                      >
+                        <Shield className="w-4 h-4" /> Admin Dashboard
+                      </button>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-3 rounded-2xl text-[#2E2825] font-medium hover:bg-[#F5EBF0] flex items-center gap-2"

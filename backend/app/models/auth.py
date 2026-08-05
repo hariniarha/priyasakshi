@@ -20,6 +20,7 @@ class UserOut(BaseModel):
     name: str
     email: str
     email_verified: bool = False
+    is_admin: bool = False
 
 
 class TokenResponse(BaseModel):

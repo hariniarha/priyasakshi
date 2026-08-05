@@ -11,6 +11,7 @@ from typing import Optional
 
 from fastapi import Depends, Header, HTTPException, Request, status
 
+from .config import settings
 from .services.auth_service import auth_service
 from .services.security import decode_token
 
@@ -48,6 +49,22 @@ async def get_optional_user(request: Request, authorization: Optional[str] = Hea
     if not payload or payload.get("type") != "access":
         return None
     return await auth_service.get_user_by_id(payload["sub"])
+
+
+async def get_admin_user(request: Request, authorization: Optional[str] = Header(default=None)):
+    """Resolve the current user and require admin privileges (403 otherwise)."""
+    token = _token_from(request, authorization)
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+    payload = decode_token(token)
+    if not payload or payload.get("type") != "access":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+    user = await auth_service.get_user_by_id(payload["sub"])
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    if user.get("email", "").lower() not in settings.admin_emails_set:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    return user
 
 
 def set_auth_cookies(response, access_token: str, refresh_token: str) -> None:
