@@ -50,6 +50,13 @@ async def get_optional_user(request: Request, authorization: Optional[str] = Hea
     return await auth_service.get_user_by_id(payload["sub"])
 
 
+async def get_admin_user(request: Request, authorization: Optional[str] = Header(default=None)):
+    user = await get_current_user(request, authorization)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
+    return user
+
+
 def set_auth_cookies(response, access_token: str, refresh_token: str) -> None:
     response.set_cookie(
     ACCESS_COOKIE,

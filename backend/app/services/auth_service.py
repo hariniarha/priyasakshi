@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from ..config import settings
+from ..config import is_admin_email, settings
 from ..db import get_db, serialize_doc
 from ..models.auth import UserCreate, UserOut
 from . import security
@@ -36,6 +36,7 @@ class AuthService:
             "email": payload.email.lower(),
             "password_hash": security.hash_password(payload.password),
             "email_verified": False,
+            "role": "admin" if is_admin_email(payload.email) else "customer",
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
         await get_db().users.insert_one(user)
@@ -159,6 +160,7 @@ class AuthService:
             name=user["name"],
             email=user["email"],
             email_verified=user.get("email_verified", False),
+            role=user.get("role", "admin" if is_admin_email(user.get("email")) else "customer"),
         )
 
 

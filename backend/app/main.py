@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
 from .db import close_db, get_db
-from .routes import addresses, auth, contact, health, newsletter, orders, payments, profile
+from .routes import addresses, admin, auth, contact, health, newsletter, orders, payments, profile
 
 logging.basicConfig(
     level=logging.INFO,
@@ -66,6 +66,7 @@ def create_app() -> FastAPI:
     app.include_router(payments.router, prefix="/api")
     app.include_router(profile.router, prefix="/api")
     app.include_router(addresses.router, prefix="/api")
+    app.include_router(admin.router, prefix="/api")
 
     return app
 

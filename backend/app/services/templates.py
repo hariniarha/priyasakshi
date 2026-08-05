@@ -117,3 +117,49 @@ def password_reset_html(brand: str, reset_url: str) -> str:
         f"<p style='font-size:13px;color:#2E2825'>If you didn't request this, you can safely ignore this email. Link: {reset_url}</p>"
     )
     return _shell(brand, content)
+
+
+_STATUS_LABELS = {
+    "confirmed": "Order Confirmed",
+    "packed": "Packed",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Order Cancelled",
+}
+
+
+def order_status_update_html(brand: str, order: dict) -> str:
+    status = order.get("status", "")
+    label = _STATUS_LABELS.get(status, status)
+    order_id = order.get("id", "")
+    when = order.get("created_at", "")
+
+    tracking_rows = ""
+    if order.get("courier") or order.get("tracking_number") or order.get("estimated_delivery"):
+        tracking_rows = (
+            f"<h3 style='color:#8B2956'>Tracking Details</h3>"
+            f"<p>"
+            f"<strong>Courier:</strong> {order.get('courier') or '—'}<br>"
+            f"<strong>Tracking Number:</strong> {order.get('tracking_number') or '—'}<br>"
+            f"<strong>Estimated Delivery:</strong> {order.get('estimated_delivery') or '—'}"
+            f"</p>"
+        )
+
+    items = _items_table(order.get("items", []))
+
+    content = (
+        f"<h2 style='color:#8B2956;margin-top:0'>{label}</h2>"
+        f"<p>Hi {order.get('customer_name','there')},</p>"
+        f"<p>Your order <strong>#{order_id[:8]}</strong> has been updated to "
+        f"<strong>{label}</strong>.</p>"
+        f"{tracking_rows}"
+        f"<p><strong>Order ID:</strong> {order_id}</p>"
+        f"<p><strong>Order Date:</strong> {when}</p>"
+        f"<h3 style='color:#8B2956'>Your Items</h3>"
+        f"{items}"
+        f"<p style='text-align:right;font-size:16px;margin-top:16px'>"
+        f"<strong>Total: ₹{order.get('total',0):,.0f}</strong></p>"
+        f"<p style='margin-top:24px;font-size:13px;color:#2E2825'>"
+        f"Need help? Reply to this email.</p>"
+    )
+    return _shell(brand, content)

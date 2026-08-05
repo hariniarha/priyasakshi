@@ -134,5 +134,27 @@ class EmailService:
             html,
         )
 
+    async def send_order_status_update(self, order: dict) -> None:
+        from .templates import order_status_update_html
+
+        status = order.get("status", "")
+        if status not in {"confirmed", "packed", "shipped", "delivered", "cancelled"}:
+            return
+
+        label = {
+            "confirmed": "Order Confirmed",
+            "packed": "Order Packed",
+            "shipped": "Order Shipped",
+            "delivered": "Order Delivered",
+            "cancelled": "Order Cancelled",
+        }.get(status, status)
+
+        html = order_status_update_html(settings.brand_name, order)
+        await self._send(
+            order.get("customer_email", ""),
+            f"{label} — {settings.brand_name}",
+            html,
+        )
+
 
 email_service = EmailService()

@@ -16,6 +16,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
+# Emails that are automatically granted the admin role on registration.
+ADMIN_EMAILS = {
+    "arunbabuceg@gmail.com",
+    "admin@priyasakshi.com",
+}
+
+
+def is_admin_email(email: str | None) -> bool:
+    return bool(email) and email.lower() in ADMIN_EMAILS
+
 
 class Settings(BaseSettings):
     """Typed settings container."""
