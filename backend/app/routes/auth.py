@@ -84,7 +84,6 @@ async def me(user=Depends(get_current_user)):
     return UserOut(
         id=user["id"], name=user["name"], email=user["email"],
         email_verified=user.get("email_verified", False),
-        role=user.get("role", "customer"),
     )
 
 

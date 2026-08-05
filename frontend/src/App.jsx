@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import HomePage from '@/pages/HomePage.jsx';
 import AuthPage from '@/pages/AuthPage.jsx';
@@ -13,12 +13,6 @@ import MyOrdersPage from '@/pages/MyOrdersPage.jsx';
 import OrderDetailsPage from '@/pages/OrderDetailsPage.jsx';
 import ProfilePage from '@/pages/ProfilePage.jsx';
 import AddressesPage from '@/pages/AddressesPage.jsx';
-import AdminLayout from '@/components/admin/AdminLayout.jsx';
-import AdminDashboardPage from '@/pages/admin/AdminDashboardPage.jsx';
-import AdminOrdersPage from '@/pages/admin/AdminOrdersPage.jsx';
-import AdminOrderDetailsPage from '@/pages/admin/AdminOrderDetailsPage.jsx';
-import AdminCustomersPage from '@/pages/admin/AdminCustomersPage.jsx';
-import AdminMessagesPage from '@/pages/admin/AdminMessagesPage.jsx';
 import { CartProvider } from '@/context/CartContext.jsx';
 import { AuthProvider } from '@/context/AuthContext.jsx';
 import './App.css';
@@ -42,14 +36,6 @@ export default function App() {
             <Route path="/account/orders/:orderId" element={<OrderDetailsPage />} />
             <Route path="/account/profile" element={<ProfilePage />} />
             <Route path="/account/addresses" element={<AddressesPage />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboardPage />} />
-              <Route path="orders" element={<AdminOrdersPage />} />
-              <Route path="orders/:orderId" element={<AdminOrderDetailsPage />} />
-              <Route path="customers" element={<AdminCustomersPage />} />
-              <Route path="messages" element={<AdminMessagesPage />} />
-            </Route>
           </Routes>
           <Toaster
             position="bottom-center"
